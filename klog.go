@@ -619,29 +619,17 @@ func (l *loggingT) formatHeader(s severity, file string, line int) *buffer {
 
 	// Avoid Fprintf, for speed. The format is so simple that we can do it quickly by hand.
 	// It's worth about 3X. Fprintf is hard.
-	year, month, day := now.Date()
-	hour, minute, second := now.Clock()
+	// year, month, day := now.Date()
+	// hour, minute, second := now.Clock()
 	// Lmmdd hh:mm:ss.uuuuuu threadid file:line]
 
-	// buf.tmp[0] = severityChar[s]
-	buf.nDigits(4, 0, year, '0')
-	buf.tmp[4] = '-'
-	buf.twoDigits(5, int(month))
-	buf.tmp[7] = '-'
-	buf.twoDigits(8, day)
-	buf.tmp[10] = ' '
-	buf.twoDigits(11, hour)
-	buf.tmp[13] = ':'
-	buf.twoDigits(14, minute)
-	buf.tmp[16] = ':'
-	buf.twoDigits(17, second)
-	buf.tmp[19] = '.'
-	buf.nDigits(6, 20, now.Nanosecond()/1000, '0')
-	buf.tmp[26] = ' '
-	buf.nDigits(7, 27, pid, ' ') // TODO: should be TID
-	buf.tmp[34] = ' '
-	buf.tmp[35] = '['
-	buf.Write(buf.tmp[:36])
+	tmp := now.Format("2006-01-02 15:04:05.999 MST")
+	buf.WriteString(tmp)
+	buf.tmp[0] = ' '
+	buf.nDigits(7, 1, pid, ' ') // TODO: should be TID
+	buf.tmp[8] = ' '
+	buf.tmp[9] = '['
+	buf.Write(buf.tmp[:10])
 	buf.WriteString(severityName[s])
 	buf.tmp[0] = ']'
 	buf.tmp[1] = ' '
