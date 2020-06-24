@@ -3,12 +3,13 @@ package main
 import (
 	"flag"
 
+	klogv2 "github.com/nenly/klog"
 	klogv1 "k8s.io/klog"
-	klogv2 "k8s.io/klog/v2"
 )
 
 // OutputCallDepth is the stack depth where we can find the origin of this call
 const OutputCallDepth = 6
+
 // log prefix that we have to strip out
 const DefaultPrefixLength = 53
 
@@ -60,8 +61,8 @@ func main() {
 	klogv1.InitFlags(&klogv1Flags)
 	klogv1Flags.Set("logtostderr", "false")     // By default klog v1 logs to stderr, switch that off
 	klogv1Flags.Set("stderrthreshold", "FATAL") // stderrthreshold defaults to ERROR, use this if you
-															 // don't want anything in your stderr
-	klogv1.SetOutputBySeverity("INFO", klogWriter{})  // tell klog v1 to use the writer
+	// don't want anything in your stderr
+	klogv1.SetOutputBySeverity("INFO", klogWriter{}) // tell klog v1 to use the writer
 	// END : hack to redirect klogv1 calls to klog v2
 
 	// Now you can mix klogv1 and v2 in the same code base

@@ -619,30 +619,38 @@ func (l *loggingT) formatHeader(s severity, file string, line int) *buffer {
 
 	// Avoid Fprintf, for speed. The format is so simple that we can do it quickly by hand.
 	// It's worth about 3X. Fprintf is hard.
-	_, month, day := now.Date()
+	year, month, day := now.Date()
 	hour, minute, second := now.Clock()
 	// Lmmdd hh:mm:ss.uuuuuu threadid file:line]
-	buf.tmp[0] = severityChar[s]
-	buf.twoDigits(1, int(month))
-	buf.twoDigits(3, day)
-	buf.tmp[5] = ' '
-	buf.twoDigits(6, hour)
-	buf.tmp[8] = ':'
-	buf.twoDigits(9, minute)
-	buf.tmp[11] = ':'
-	buf.twoDigits(12, second)
-	buf.tmp[14] = '.'
-	buf.nDigits(6, 15, now.Nanosecond()/1000, '0')
-	buf.tmp[21] = ' '
-	buf.nDigits(7, 22, pid, ' ') // TODO: should be TID
-	buf.tmp[29] = ' '
-	buf.Write(buf.tmp[:30])
+
+	// buf.tmp[0] = severityChar[s]
+	buf.nDigits(4, 0, year, '0')
+	buf.tmp[4] = '-'
+	buf.twoDigits(5, int(month))
+	buf.tmp[7] = '-'
+	buf.twoDigits(8, day)
+	buf.tmp[10] = ' '
+	buf.twoDigits(11, hour)
+	buf.tmp[13] = ':'
+	buf.twoDigits(14, minute)
+	buf.tmp[16] = ':'
+	buf.twoDigits(17, second)
+	buf.tmp[19] = '.'
+	buf.nDigits(6, 20, now.Nanosecond()/1000, '0')
+	buf.tmp[26] = ' '
+	buf.nDigits(7, 27, pid, ' ') // TODO: should be TID
+	buf.tmp[34] = ' '
+	buf.Write(buf.tmp[:35])
 	buf.WriteString(file)
 	buf.tmp[0] = ':'
 	n := buf.someDigits(1, line)
-	buf.tmp[n+1] = ']'
-	buf.tmp[n+2] = ' '
+	buf.tmp[n+1] = ' '
+	buf.tmp[n+2] = '['
 	buf.Write(buf.tmp[:n+3])
+	buf.WriteString(severityName[s])
+	buf.tmp[0] = ']'
+	buf.tmp[1] = ' '
+	buf.Write(buf.tmp[:2])
 	return buf
 }
 
